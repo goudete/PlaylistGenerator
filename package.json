@@ -1,0 +1,22 @@
+{
+  "name": "playlistgenerator",
+  "version": "1.0.0",
+  "description": "Matches my Spotify liked songs based on bpm",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goudete/PlaylistGenerator.git"
+  },
+  "author": "Enrique Goudet",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/goudete/PlaylistGenerator/issues"
+  },
+  "homepage": "https://github.com/goudete/PlaylistGenerator#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
