@@ -1,16 +1,14 @@
 'use strict';
 
 const express = require('express');
-const bodyParser = require('body-parser');
-
 
 const execute = require('./execute');
 const { handleError } = require('./execute/middleware/error_handler');
 
 
 const app = express();
-
-app.use(bodyParser.json({ limit: '5mb' }));
+app.use(express.json({limit: '1000mb'}));
+app.use(express.urlencoded({limit: '1000mb'}));
 
 app.post('/run', run, (req, res) => {
   res.redirect(307, `/run-agent/${req.body.agent_type}/${req.body.id}`)
