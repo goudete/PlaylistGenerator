@@ -2,14 +2,11 @@
 
 const express = require('express');
 
-const {
-    getTracks
-} = require('./steps.js');
-
 const router = express.Router();
-router.use(getTracks);
 
-router.route('/:id')
-    .post(showResults);
+// guards middleware would go here
+
+router.use('/refreshToken', require('./endpoints/refreshToken'));
+router.use('/getTracks', require('./endpoints/getTracks'))
     
 module.exports = router;
