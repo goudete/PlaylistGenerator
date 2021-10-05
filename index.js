@@ -11,11 +11,12 @@ const app = express();
 app.use(express.json({limit: '1000mb'}));
 app.use(express.urlencoded({limit: '1000mb'}));
 
-app.post((req, res) => {
-  res.redirect(307, `/createConnection/refreshToken`)
+app.post('/createConnection', (req, res) => {
+  console.log('*** IN MAIN INDEX ABOUT TO REDIRECT ***')
+  res.redirect(307, `/execute/${req.body.endpoint}`)
 });
 
-app.use('/createConnection', execute);
+app.use('/execute', execute);
 app.use(handleError);
 
 
