@@ -4,8 +4,8 @@
 const showResults = (req, res) => {
     return res.json({
         status: 'ok',
-        type: req.body.agent_type,
-        info: req.externalAgent.info,
+        endpoint: req.body.endpoint,
+        info: req.info,
     });
 }
 

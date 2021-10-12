@@ -3,10 +3,11 @@
 const express = require('express');
 const router = express.Router();
 
-const { showResults } = require('../../middleware/show_results')
 const { refreshToken } = require('./steps.js');
+const { showResults } = require('../../middleware/show_results');
+
 
 router.use(refreshToken);
-router.post(showResults);
+router.use(showResults);
     
 module.exports = router;
