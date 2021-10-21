@@ -1,5 +1,5 @@
 
-function generateRandomString(length) {
+const generateRandomString = (length) => {
     let text = '';
     let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   
@@ -9,6 +9,6 @@ function generateRandomString(length) {
     return text;
 };
 
-modules.export = {
+module.exports = {
     generateRandomString
 }

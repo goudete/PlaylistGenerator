@@ -1,4 +1,4 @@
-modules.export = (req, res) => {
+module.exports = (req, res) => {
 	// your application requests refresh and access tokens
   	// after checking the state parameter
 

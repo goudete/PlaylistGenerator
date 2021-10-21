@@ -14,9 +14,9 @@ app.use(express.json({limit: '1000mb'}));
 app.use(express.urlencoded({limit: '1000mb'}));
 
 
-app.get('/login', require('./middleware/login'));
-app.get('/callback', require('./middleware/callback'));
-app.post('/createConnection', require('./middleware/redirect'));
+app.get('/login', require('./execute/endpoints/login'));
+app.get('/callback', require('./execute/endpoints/callback'));
+app.post('/execute', require('./execute/endpoints/redirect'));
 
 app.use('/execute', execute);
 app.use(handleError);
