@@ -7,9 +7,9 @@ const config = require('../../../const');
 const SPOTIFY_URL = 'https://api.spotify.com/v1/me/tracks';
 
 
-const getTracks = async (req, res, next) => {
+const get = async (req, res, next) => {
     try {
-        const spotifyResponse = await axios({
+        const { data } = await axios({
             url: SPOTIFY_URL,
             method: 'GET',
             params: {
@@ -22,7 +22,7 @@ const getTracks = async (req, res, next) => {
         });
 
         req.info = {
-            ...spotifyResponse.data,
+            ...data,
         };
         next();
 
@@ -31,6 +31,26 @@ const getTracks = async (req, res, next) => {
     }
 };
 
+const parse = async (req, res, next) => {
+    try {
+        // grab TRACK IDs and store
+        
+    } catch (err) {
+        next(err);
+    }
+};
+
+const save = async (req, res, next) => {
+    try {
+        // send TRACK IDs to db
+
+    } catch (err) {
+        next(err);
+    }
+};
+
 module.exports = {
-    getTracks,
+    get,
+    parse,
+    save
 };

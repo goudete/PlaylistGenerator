@@ -14,7 +14,8 @@ const refreshToken = async (req, res, next) => {
             'grant_type': 'refresh_token',
             'refresh_token': config.REFRESH_TOKEN
         }
-        const options = {
+
+        const { data } = await axios({
             method: 'POST',
             headers: {
                 'Authorization': 'Basic ' + (new Buffer(config.CLIENT_ID + ':' + config.CLIENT_SECRET).toString('base64')),
@@ -22,11 +23,10 @@ const refreshToken = async (req, res, next) => {
             },
             data: qs.stringify(bodyData),
             url: SPOTIFY_URL,
-        };
-        const spotifyResponse = await axios(options);
+        });
 
         req.info = {
-            ...spotifyResponse.data,
+            ...data,
         };
         next();
         
