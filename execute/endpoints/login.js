@@ -3,24 +3,15 @@ const config = require('../../const');
 const querystring = require('querystring');
 const { generateRandomString } = require('../../utils/generateRandomString');
 
-const STATE = generateRandomString(16);
-const SCOPE = `
-				user-read-private 
-				user-library-read 
-				playlist-read-private 
-				playlist-modify-private 
-				playlist-modify-public
-
-			`;
-
+const SCOPE = 'user-read-private user-library-read playlist-read-private playlist-modify-private playlist-modify-public';
 const RESPONSE_TYPE = 'code';
-
 
 
 module.exports = (req, res, next) => {
 	try {
-
-        res.cookie(config.STATE_KEY, STATE);
+        const state = generateRandomString(16);
+        console.log('here')
+        res.cookie(config.STATE_KEY, state);
         
         return res.redirect('https://accounts.spotify.com/authorize?' +
             querystring.stringify({
@@ -28,7 +19,7 @@ module.exports = (req, res, next) => {
                 client_id: config.CLIENT_ID,
                 scope: SCOPE,
                 redirect_uri: config.REDIRECT_URI,
-                state: STATE
+                state: state
             }));
         
     } catch (err) {
