@@ -22,7 +22,7 @@ const get = async (req, res, next) => {
         });
 
         req.info = {
-            ...data,
+            spotifyData: data
         };
         next();
 
@@ -33,24 +33,31 @@ const get = async (req, res, next) => {
 
 const parse = async (req, res, next) => {
     try {
-        // grab TRACK IDs and store
+        const tracks = req.info.spotifyData.items;
+        const trackIds = tracks.map((item) => item.track.id)
+
+        req.info = {
+            ...req.info,
+            trackIds
+        }
+        next();
         
     } catch (err) {
         next(err);
     }
 };
 
-const save = async (req, res, next) => {
-    try {
-        // send TRACK IDs to db
+// const save = async (req, res, next) => {
+//     try {
+//         // send TRACK IDs to db
 
-    } catch (err) {
-        next(err);
-    }
-};
+//     } catch (err) {
+//         next(err);
+//     }
+// };
 
 module.exports = {
     get,
     parse,
-    save
+    // save
 };
