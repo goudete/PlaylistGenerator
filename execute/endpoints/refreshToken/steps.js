@@ -10,12 +10,10 @@ const SPOTIFY_URL = 'https://accounts.spotify.com/api/token';
 
 const refreshToken = async (req, res, next) => {
     try {
-
         const bodyData = {
             'grant_type': 'refresh_token',
             'refresh_token': config.REFRESH_TOKEN
         }
-
         const options = {
             method: 'POST',
             headers: {
@@ -25,7 +23,6 @@ const refreshToken = async (req, res, next) => {
             data: qs.stringify(bodyData),
             url: SPOTIFY_URL,
         };
-
         const spotifyResponse = await axios(options);
 
         req.info = {

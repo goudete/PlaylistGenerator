@@ -8,10 +8,8 @@ const SPOTIFY_URL = 'https://api.spotify.com/v1/me/tracks';
 
 
 const getTracks = async (req, res, next) => {
-    
     try {
-
-        const { data: { response }, request: { path } } = await axios({
+        const spotifyResponse = await axios({
             url: SPOTIFY_URL,
             method: 'GET',
             params: {
@@ -22,20 +20,15 @@ const getTracks = async (req, res, next) => {
                 'Authorization': `Bearer ${config.TOKEN}`
             }
         });
-        const { Error } = response;
-        if (Error && Error.ErrorCode) {
-            next(`${Error.ErrorMsg}, Error Code ${Error.ErrorCode}`);
-        } else {
-            req.tracks = {
-                response,
-            };
-            next();
-        }
+
+        req.info = {
+            ...spotifyResponse.data,
+        };
+        next();
 
     } catch (err) {
         next(err);
     }
-
 };
 
 module.exports = {
