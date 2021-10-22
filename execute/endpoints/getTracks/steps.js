@@ -22,7 +22,7 @@ const get = async (req, res, next) => {
         });
 
         req.info = {
-            spotifyData: data
+            apiResponse: data
         };
         next();
 
@@ -33,7 +33,7 @@ const get = async (req, res, next) => {
 
 const parse = async (req, res, next) => {
     try {
-        const tracks = req.info.spotifyData.items;
+        const tracks = req.info.apiResponse.items;
         const trackIds = tracks.map((item) => item.track.id)
 
         req.info = {

@@ -1,64 +1,57 @@
 
 const config = require('../../const');
+const axios = require('axios');
+const qs = require('qs');
 const querystring = require('querystring');
-var request = require('request');
+const { nextTick } = require('process');
 
 
-module.exports = (req, res) => {
+module.exports = async (req, res, next) => {
 
-	var code = req.query.code || null;
-	var state = req.query.state || null;
-	var storedState = req.headers.cookie ? req.headers.cookie.slice(19) : null;
+	const code = req.query.code || null;
+	const state = req.query.state || null;
+	const storedState = req.headers.cookie ? req.headers.cookie.slice(19) : null;
   
-	if (state === null || state !== storedState) {
-	  res.redirect('/#' +
-		querystring.stringify({
-			error: 'state_mismatch'
-		}));
-	} else {
-	  	res.clearCookie(config.STATE_KEY);
-	  	var authOptions = {
-			url: 'https://accounts.spotify.com/api/token',
-			form: {
-				code: code,
-				redirect_uri: config.REDIRECT_URI,
-				grant_type: 'authorization_code'
-			},
-			headers: {
-				'Authorization': 'Basic ' + (new Buffer(config.CLIENT_ID + ':' + config.CLIENT_SECRET).toString('base64'))
-			},
-			json: true
-	  	};
-  
-	  request.post(authOptions, function(error, response, body) {
-		if (!error && response.statusCode === 200) {
-  
-			var access_token = body.access_token,
-				refresh_token = body.refresh_token;
-	
-			var options = {
-				url: 'https://api.spotify.com/v1/me',
-				headers: { 'Authorization': 'Bearer ' + access_token },
-				json: true
-			};
-	
-			// use the access token to access the Spotify Web API
-			request.get(options, function(error, response, body) {
-				console.log(body);
-			});
-	
-			// we can also pass the token to the browser to make requests from there
-			res.redirect('/#' +
-				querystring.stringify({
-				access_token: access_token,
-				refresh_token: refresh_token
-				}));
-		} else {
-		  res.redirect('/#' +
+	if (isInvalidState(state, storedState)) {
+		res.redirect('/#' +
 			querystring.stringify({
-				error: 'invalid_token'
+				error: 'state_mismatch'
 			}));
-		}
-	  });
+		return;
+	}
+
+	res.clearCookie(config.STATE_KEY);
+
+	const requestBody = {
+		code,
+		redirect_uri: config.REDIRECT_URI,
+		grant_type: 'authorization_code'
+	}
+
+	try {
+		const { status, data: { access_token, refresh_token }} = await axios({
+			method: 'POST',
+			headers: {
+				'Authorization': 'Basic ' + (new Buffer(config.CLIENT_ID + ':' + config.CLIENT_SECRET).toString('base64')),
+				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			data: qs.stringify(requestBody),
+			url: 'https://accounts.spotify.com/api/token',
+		});
+
+		console.log({
+			message: "OK",
+			status,
+			access_token,
+			refresh_token
+		});
+
+	} catch (err) {
+		next(err)
 	}
 };
+
+
+function isInvalidState(state, storedState) {
+	return state === null || state !== storedState;
+}
