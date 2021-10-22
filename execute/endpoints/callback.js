@@ -3,7 +3,6 @@ const config = require('../../const');
 const axios = require('axios');
 const qs = require('qs');
 const querystring = require('querystring');
-const { nextTick } = require('process');
 
 
 module.exports = async (req, res, next) => {

@@ -1,8 +1,9 @@
 
 export interface Track {
-    id: String
+    spotifyId: String
+    userId: Number
+    name: String
     tempo: Number
     danceability: Number
     energy: Number
-    liveness: Number
 }
