@@ -5,7 +5,8 @@ const axios = require('axios');
 const config = require('../../../const');
 
 const SPOTIFY_URL = 'https://api.spotify.com/v1/me/tracks';
-
+const LIMIT = 0;
+const OFFSET = 0;
 
 const get = async (req, res, next) => {
     try {
