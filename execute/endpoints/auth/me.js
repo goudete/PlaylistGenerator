@@ -10,17 +10,7 @@ const SPOTIFY_URL = 'https://api.spotify.com/v1/me';
 
 module.exports = async (req, res, next) => {
     try {
-        const { data } = await axios({
-            url: SPOTIFY_URL,
-            method: 'GET',
-            params: {
-                json: true
-            },
-            headers: {
-                'Authorization': `Bearer ${config.TOKEN}`
-            }
-        });
-
+        const { data } = await helpers.getMe();
         const me = helpers.createMe(data);
 
         // this line is acting out, related to postgres config
@@ -37,6 +27,18 @@ module.exports = async (req, res, next) => {
 }
 
 const helpers = {
+    getMe: async () => {
+        return await axios({
+            url: SPOTIFY_URL,
+            method: 'GET',
+            params: {
+                json: true
+            },
+            headers: {
+                'Authorization': `Bearer ${config.TOKEN}`
+            }
+        })
+    },
     createMe: (data) => {
         const displayName = data.display_name;
         const country = data.country;
@@ -47,5 +49,5 @@ const helpers = {
             country_code: country,
             created_at: timestamp
         };
-    }
+    },
 }
