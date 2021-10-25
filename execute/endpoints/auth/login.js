@@ -1,6 +1,6 @@
 
-const config = require('../../const');
-const { generateRandomString } = require('../../utils/generateRandomString');
+const config = require('../../../const');
+const { generateRandomString } = require('../../../utils/generateRandomString');
 const querystring = require('querystring');
 
 const RESPONSE_TYPE = 'code';

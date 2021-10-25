@@ -11,8 +11,9 @@ const app = express();
 app.use(express.json({limit: '1000mb'}));
 app.use(express.urlencoded({limit: '1000mb'}));
 
-app.get('/login', require('./execute/endpoints/login'));
-app.get('/callback', require('./execute/endpoints/callback'));
+app.get('/login', require('./execute/endpoints/auth/login'));
+app.get('/callback', require('./execute/endpoints/auth/callback'));
+app.get('/me', require('./execute/endpoints/auth/me'));
 app.post('/execute', require('./execute/endpoints/redirect'));
 
 app.use('/execute', execute);

@@ -1,5 +1,5 @@
 
-const config = require('../../const');
+const config = require('../../../const');
 const axios = require('axios');
 const qs = require('qs');
 const querystring = require('querystring');
@@ -44,6 +44,13 @@ module.exports = async (req, res, next) => {
             access_token,
             refresh_token
         });
+
+        return res.status(200).json({
+            message: "ok",
+            status,
+            access_token,
+            refresh_token
+        })
 
     } catch (err) {
         next(err)

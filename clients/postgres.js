@@ -6,8 +6,8 @@ const postgres = require('knex')({
         host: config.POSTGRES_HOST,
         user: config.POSTGRES_USER,
         password: config.POSTGRES_PASSWORD,
-        database: config.DB,
-    },
-});
+        database: config.MARTY_DB,
+      },
+  });
 
 module.exports = postgres;
