@@ -10,15 +10,13 @@ const SPOTIFY_URL = 'https://api.spotify.com/v1/me';
 
 module.exports = async (req, res, next) => {
     try {
-        const { data } = await helpers.getMe();
-        const me = helpers.createMe(data);
-
-        // this line is acting out, related to postgres config
-        // const insert = await postgres('users').insert([me]);
+        const { data } = await helpers.getUser();
+        const user = helpers.createUser(data);
+        const insert = await postgres('users').insert([user]);
 
         return res.json({
             message: 'ok',
-            me
+            user
         });
 
     } catch (err) {
@@ -27,7 +25,7 @@ module.exports = async (req, res, next) => {
 }
 
 const helpers = {
-    getMe: async () => {
+    getUser: async () => {
         return await axios({
             url: SPOTIFY_URL,
             method: 'GET',
@@ -39,7 +37,7 @@ const helpers = {
             }
         })
     },
-    createMe: (data) => {
+    createUser: (data) => {
         const displayName = data.display_name;
         const country = data.country;
         const timestamp = moment().unix();

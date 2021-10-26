@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 
 const { refreshToken } = require('./steps.js');
-const { showResults } = require('../../middleware/show_results');
+const { showResults } = require('../../middleware/showResults');
 
 
 router.use(refreshToken);
