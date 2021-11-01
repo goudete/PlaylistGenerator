@@ -18,7 +18,7 @@ const get = async (req, res, next) => {
                 offset: 0,
             },
             headers: {
-                'Authorization': `Bearer ${config.TOKEN}`
+                'Authorization': `Bearer ${config.ACCESS_TOKEN}`
             }
         });
 
@@ -48,14 +48,19 @@ const parse = async (req, res, next) => {
     }
 };
 
-// const save = async (req, res, next) => {
-//     try {
-//         // send TRACK IDs to db
+const save = async (req, res, next) => {
+    try {
+        // send TRACK IDs to db
+        // how to know which user is logged in?
+        const track = {
+            spotify_id,
+            user_id,
+        }
 
-//     } catch (err) {
-//         next(err);
-//     }
-// };
+    } catch (err) {
+        next(err);
+    }
+};
 
 module.exports = {
     get,

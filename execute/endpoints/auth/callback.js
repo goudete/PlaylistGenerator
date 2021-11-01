@@ -18,14 +18,7 @@ module.exports = async (req, res, next) => {
     res.clearCookie(config.STATE_KEY);
 
     try {
-        const { status, data: { access_token, refresh_token }} = helpers.getTokens();
-
-        console.log({
-            message: "ok",
-            status,
-            access_token,
-            refresh_token
-        });
+        const { status, data: { access_token, refresh_token }} = await helpers.getTokens(code);
 
         return res.status(200).json({
             message: "ok",
@@ -33,7 +26,6 @@ module.exports = async (req, res, next) => {
             access_token,
             refresh_token
         })
-
     } catch (err) {
         next(err)
     }
@@ -51,14 +43,14 @@ const helpers = {
                 error: 'state_mismatch'
             }));
     },
-    getTokens: async () => {
+    getTokens: async (code) => {
         const requestBody = {
             code,
             redirect_uri: config.REDIRECT_URI,
             grant_type: 'authorization_code'
         }
 
-        return await axios({
+        return axios({
             method: 'POST',
             headers: {
                 'Authorization': 'Basic ' + (new Buffer(config.CLIENT_ID + ':' + config.CLIENT_SECRET).toString('base64')),

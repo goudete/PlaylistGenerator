@@ -12,13 +12,20 @@ module.exports = async (req, res, next) => {
     try {
         const { data } = await helpers.getUser();
         const user = helpers.createUser(data);
-        const insert = await postgres('users').insert([user]);
-
-        return res.json({
-            message: 'ok',
-            user
-        });
-
+        const isExistingUser = await postgres('users').where({spotify_uri: user.spotify_uri});
+        
+        if (isExistingUser.length) {
+            return res.json({
+                message: 'user already exists',
+                isExistingUser
+            });
+        } else {
+            const insert = await postgres('users').insert([user]);
+            return res.json({
+                message: 'user already exists',
+                user
+            });
+        }
     } catch (err) {
         next(err);
     }
@@ -33,19 +40,21 @@ const helpers = {
                 json: true
             },
             headers: {
-                'Authorization': `Bearer ${config.TOKEN}`
+                'Authorization': `Bearer ${config.ACCESS_TOKEN}`
             }
         })
     },
     createUser: (data) => {
         const displayName = data.display_name;
         const country = data.country;
+        const spotifyUri = data.uri;
         const timestamp = moment().unix();
 
         return {
             display_name: displayName,
             country_code: country,
-            created_at: timestamp
+            created_at: timestamp,
+            spotify_uri: spotifyUri
         };
     },
 }
