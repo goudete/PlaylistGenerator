@@ -22,5 +22,5 @@ app.use(handleError);
 
 
 const server = app.listen(consts.PORT, consts.HOST);
-console.log(`Running on http://${consts.HOST}:${consts.PORT}`);
+console.log(`Listening on http://${consts.HOST}:${consts.PORT}`);
 
