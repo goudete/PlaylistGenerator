@@ -5,6 +5,7 @@ const moment = require('moment')
 
 const config = require('../../../const');
 const postgres = require('../../../clients/postgres');
+const { showResults } = require('../../middleware/showResults');
 
 const SPOTIFY_URL = 'https://api.spotify.com/v1/me';
 
@@ -21,10 +22,12 @@ module.exports = async (req, res, next) => {
             });
         } else {
             const insert = await postgres('users').insert([user]);
-            return res.json({
-                message: 'user already exists',
+            
+            req.info = {
                 user
-            });
+            }
+            
+            return showResults(req, res)
         }
     } catch (err) {
         next(err);

@@ -4,11 +4,12 @@ const axios = require('axios');
 const qs = require('qs');
 
 const config = require('../../../const');
+const { showResults } = require('../../middleware/showResults');
 
 const SPOTIFY_URL = 'https://accounts.spotify.com/api/token';
 
 
-const refreshToken = async (req, res, next) => {
+module.exports = async (req, res, next) => {
     try {
         const bodyData = {
             'grant_type': 'refresh_token',
@@ -28,15 +29,10 @@ const refreshToken = async (req, res, next) => {
         req.info = {
             ...data,
         };
-        next();
+
+        return showResults(req, res)
         
     } catch (err) {
         next(err);
     }
-
-};
-
-module.exports = {
-    refreshToken,
-};
-
+}
