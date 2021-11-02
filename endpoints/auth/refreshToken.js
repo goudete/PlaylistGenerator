@@ -3,7 +3,7 @@
 const axios = require('axios');
 const qs = require('qs');
 
-const config = require('../../../const');
+const config = require('../../const');
 const { showResults } = require('../../middleware/showResults');
 
 const SPOTIFY_URL = 'https://accounts.spotify.com/api/token';

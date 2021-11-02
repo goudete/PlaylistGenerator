@@ -2,8 +2,8 @@
 
 const axios = require('axios');
 
-const config = require('../../../const');
-const postgres = require('../../../clients/postgres');
+const config = require('../../const');
+const postgres = require('../../clients/postgres');
 const { showResults } = require('../../middleware/showResults');
 
 const SPOTIFY_URL = '';

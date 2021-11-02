@@ -3,8 +3,8 @@
 const axios = require('axios');
 const moment = require('moment')
 
-const config = require('../../../const');
-const postgres = require('../../../clients/postgres');
+const config = require('../../const');
+const postgres = require('../../clients/postgres');
 const { showResults } = require('../../middleware/showResults');
 
 const SPOTIFY_URL = 'https://api.spotify.com/v1/me';

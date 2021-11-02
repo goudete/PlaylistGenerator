@@ -2,8 +2,7 @@
 
 const express = require('express');
 
-const execute = require('./execute');
-const { handleError } = require('./execute/middleware/errorHandler');
+const { handleError } = require('./middleware/errorHandler');
 const consts = require('./const.js');
 
 
