@@ -43,7 +43,7 @@ module.exports = async (req, res, next) => {
         req.info = {
             totalSongs,
             items,
-            rowsToInsert,
+            tracksToInsert,
             insert
         }
         

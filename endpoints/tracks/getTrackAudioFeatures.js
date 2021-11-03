@@ -6,7 +6,7 @@ const config = require('../../const');
 const postgres = require('../../clients/postgres');
 const { showResults } = require('../../middleware/showResults');
 
-const SPOTIFY_URL = '';
+const SPOTIFY_URL = 'https://api.spotify.com/v1/audio-features';
 
 module.exports = async (req, res, next) => {
 
@@ -19,17 +19,30 @@ module.exports = async (req, res, next) => {
             // here we run into the question; what is better, 800 separate 
             // api calls and inserts OR one big api call with one big insert ?
 
+        const audioFeaturesPromises = await Promise.all(
+            savedTracks.map((track) => {
+                return axios({
+                    url: `${SPOTIFY_URL}/${track.spotify_id}`,
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${config.ACCESS_TOKEN}`,
+                    }
+                })
+            })
+        );
+
+        const audioFeatures = audioFeaturesPromises.map((audio) => audio.data)
+
         // update track with audio features
 
-        return res.json({
-            message: 'ok',
-            savedTracks
-        })
         req.info = {
-            savedTracks
+            savedTracks,
+            audioFeatures
         }
         
-        // return showResults(req, res)
+        return showResults(req, res)
 
     } catch (err) {
         next(err);
