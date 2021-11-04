@@ -15,10 +15,6 @@ module.exports = async (req, res, next) => {
     try {
         const savedTracks = await postgres('track').where({user_id: userId});
 
-        // for each track, query spotify for track's audio features
-            // here we run into the question; what is better, 800 separate 
-            // api calls and inserts OR one big api call with one big insert ?
-
         const audioFeaturesPromises = await Promise.all(
             savedTracks.map((track) => {
                 return axios({
@@ -35,14 +31,19 @@ module.exports = async (req, res, next) => {
 
         const audioFeatures = audioFeaturesPromises.map((audio) => audio.data)
 
-        // update track with audio features
+        const trackUpdates = await Promise.all(
+            audioFeatures.map((feature) => {
+                return postgres('track').where({spotify_id: feature.id}).update({tempo: feature.tempo, danceability: feature.danceability, energy: feature.energy})
+            })
+        );
 
         req.info = {
             savedTracks,
-            audioFeatures
+            audioFeatures,
+            trackUpdates
         }
         
-        return showResults(req, res)
+        return showResults(req, res);
 
     } catch (err) {
         next(err);

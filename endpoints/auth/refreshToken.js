@@ -27,7 +27,7 @@ module.exports = async (req, res, next) => {
         });
 
         req.info = {
-            data
+            ...data
         };
 
         return showResults(req, res)
