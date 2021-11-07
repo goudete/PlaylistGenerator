@@ -1,6 +1,7 @@
 'use strict';
 
 const axios = require('axios');
+const _ = require('lodash');
 
 const config = require('../../const');
 const postgres = require('../../clients/postgres');
@@ -22,42 +23,47 @@ module.exports = async (req, res, next) => {
         const totalGroupings = Math.ceil(totalTracks / totalIdsPerGrouping); // 13
 
         let idGroupings = [];
+        let currentTrackIndex = 0;
 
-        // create idGroupings
         for (let i = 0; i < totalGroupings; i++) {
             let currentGrouping = [];
             for (let j = 0; j < totalIdsPerGrouping; j++)  {
-                currentGrouping.push(savedTracks[(i*totalGroupings)+j].spotify_id); // figure out indexing issue here, almost there
+                if (currentTrackIndex >= totalTracks) break;
+                currentGrouping.push(savedTracks[currentTrackIndex].spotify_id);
+                currentTrackIndex += 1;
             }
             idGroupings.push(currentGrouping.join(','));
         }
 
-        // greatly decrease number of calls, getting a 429
         const audioFeaturesPromises = await Promise.all(
             idGroupings.map((grouping) => {
                 return axios({
-                    url: `${SPOTIFY_URL}/${grouping}`,
+                    url: `${SPOTIFY_URL}`,
                     method: 'GET',
                     headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${config.ACCESS_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    params: {
+                        ids: grouping
                     }
                 })
             })
         );
 
-        const audioFeatures = audioFeaturesPromises.map((audio) => audio.data)
+        const audioFeatures = audioFeaturesPromises.map((audio) => audio.data.audio_features)
+        const flattenedAudioFeatures = _.flatten(audioFeatures);
 
         const trackUpdates = await Promise.all(
-            audioFeatures.map((feature) => {
-                return postgres('track').where({spotify_id: feature.id}).update({tempo: feature.tempo, danceability: feature.danceability, energy: feature.energy})
+            flattenedAudioFeatures.map((track) => {
+                return postgres('track').where({spotify_id: track.id}).update({tempo: track.tempo, danceability: track.danceability, energy: track.energy})
             })
         );
 
         req.info = {
+            totalTracks,
             savedTracks,
-            audioFeatures,
+            flattenedAudioFeatures,
             trackUpdates,
             idGroupings
         }
