@@ -12,28 +12,13 @@ const MAX_CHARACTERS_FOR_IDS_IN_QUERY = 1500;
 const TRACK_ID_LENGTH = 22;
 
 module.exports = async (req, res, next) => {
-
     const userId = req.body.user_id;
 
     try {
-        const savedTracks = await postgres('track').where({user_id: userId});
-
+        const savedTracks = await postgres('track').where({ user_id: userId });
         const totalTracks = savedTracks.length;
-        const totalIdsPerGrouping = Math.ceil(MAX_CHARACTERS_FOR_IDS_IN_QUERY / TRACK_ID_LENGTH); // 69
-        const totalGroupings = Math.ceil(totalTracks / totalIdsPerGrouping); // 13
 
-        let idGroupings = [];
-        let currentTrackIndex = 0;
-
-        for (let i = 0; i < totalGroupings; i++) {
-            let currentGrouping = [];
-            for (let j = 0; j < totalIdsPerGrouping; j++)  {
-                if (currentTrackIndex >= totalTracks) break;
-                currentGrouping.push(savedTracks[currentTrackIndex].spotify_id);
-                currentTrackIndex += 1;
-            }
-            idGroupings.push(currentGrouping.join(','));
-        }
+        const idGroupings = helpers.createIdGroupings(savedTracks, totalTracks);
 
         const audioFeaturesPromises = await Promise.all(
             idGroupings.map((grouping) => {
@@ -74,4 +59,25 @@ module.exports = async (req, res, next) => {
         next(err);
     }
 
+}
+
+const helpers = {
+    createIdGroupings: (savedTracks, totalTracks) => {
+        const totalIdsPerGrouping = Math.ceil(MAX_CHARACTERS_FOR_IDS_IN_QUERY / TRACK_ID_LENGTH);
+        const totalGroupings = Math.ceil(totalTracks / totalIdsPerGrouping);
+        let idGroupings = [];
+        let currentTrackIndex = 0;
+
+        for (let i = 0; i < totalGroupings; i++) {
+            let currentGrouping = [];
+            for (let j = 0; j < totalIdsPerGrouping; j++)  {
+                if (currentTrackIndex >= totalTracks) break;
+                currentGrouping.push(savedTracks[currentTrackIndex].spotify_id);
+                currentTrackIndex += 1;
+            }
+            idGroupings.push(currentGrouping.join(','));
+        }
+
+        return idGroupings
+    },
 }
