@@ -18,6 +18,8 @@ app.get('/user', require('./endpoints/auth/user'));
 app.post('/getTracks', require('./endpoints/tracks/getTracks'));
 app.post('/getTrackAudioFeatures', require('./endpoints/tracks/getTrackAudioFeatures'));
 
+app.post('/clusterTracksByTempo', require('./endpoints/playlists/clusterTracksByTempo'));
+
 app.use(handleError);
 
 
