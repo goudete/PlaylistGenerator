@@ -5,43 +5,93 @@ const postgres = require('../../clients/postgres');
 const { showResults } = require('../../middleware/showResults');
 
 const NUMBER_OF_PLAYLISTS = 10;
+const DESCRIPTIONS = [
+    'zen mode',
+    'chill vibes',
+    'cruisin\'',
+    'groovy',
+    'funky',
+    'the zone',
+    'upbeat',
+    'hyperfreak',
+    'let\'s get crazy',
+    'throw shit off the porch'
+]
 
 module.exports = async (req, res, next) => {
     const userId = req.body.user_id;
     
     try {
-        // get tracks
         const savedTracks = await postgres('track').where({ user_id: userId });
         const tempos = savedTracks.map((track) => track.tempo);
         const minTempo = Math.min(...tempos);
         const maxTempo = Math.max(...tempos);
-
-        // create buckets (playlists)
-        // 67.616 , 82.2332, 96.8504, 111.4676, 126.0848, 140.702 ,155.3192, 169.9364, 184.5536, 199.1708, 213.788
         const bucketRange = (maxTempo - minTempo) / NUMBER_OF_PLAYLISTS;
         
+        //create bucket limits
         let bucketLimits = [minTempo];
-        
         for (let i = 1; i < NUMBER_OF_PLAYLISTS + 1; i++) {
             const currentRange = bucketLimits[i-1] + bucketRange;
             bucketLimits.push(currentRange);
         }
 
-        // create actual buckets
-        let buckets = [
-            {start: 67, end: 83},
-            {start: 84, end: 97}
-        ]
+        // create buckets
+        let buckets = [];
+        for (let i = 1; i < bucketLimits.length; i++) {
+            if (i === 1) {
+                const bucket = {
+                    start: Math.floor(bucketLimits[i-1]),
+                    end: Math.ceil(bucketLimits[i]),
+                }
+                buckets.push(bucket);
+            } else {
+                const bucket = {
+                    start: Math.ceil(bucketLimits[i-1]) + 0.0001,
+                    end: Math.ceil(bucketLimits[i]),
+                }
+                buckets.push(bucket);
+            }
+        }
 
-        // cluster by tempo
+        // assign descriptions to buckets
+        for (let i = 0; i < buckets.length; i++) {
+            let bucket = {
+                ...buckets[i],
+                description: DESCRIPTIONS[i]
+            }
+            buckets[i] = bucket
+        }
+        
+        // save buckets in postgres
+        const playlists = buckets.map((bucket) => ({
+            name: `${Math.ceil(bucket.start)} - ${bucket.end}`,
+            description: bucket.description,
+            user_id: userId,
+            range_start: bucket.start,
+            range_end: bucket.end
+        }));
+        const insert = await postgres('playlist').insert(playlists);
 
-        // save
+        const savedPlaylists = await postgres('playlist').where({ user_id: userId });
+
+
+        const assignPlaylistToTrack = await Promise.all(
+            savedTracks.map((track) => {
+                const playlistId = getPlaylistId(savedPlaylists, track);
+                return postgres('track').where({id: track.id}).update({ playlist_id: playlistId })
+            })
+        );
 
         req.info = {
+            savedTracks,
             minTempo,
             maxTempo,
             tempos,
-            bucketLimits
+            bucketLimits,
+            buckets,
+            playlists,
+            savedPlaylists,
+            assignPlaylistToTrack
         }
 
         showResults(req, res);
@@ -50,4 +100,9 @@ module.exports = async (req, res, next) => {
         next(err);
     }
 
+}
+
+function getPlaylistId(playlists, track) {
+    const playlist = playlists.find(playlist => playlist.range_start <= track.tempo && track.tempo <= playlist.range_end);
+    return playlist?.id;
 }
