@@ -28,14 +28,12 @@ module.exports = async (req, res, next) => {
         const maxTempo = Math.max(...tempos);
         const bucketRange = (maxTempo - minTempo) / NUMBER_OF_PLAYLISTS;
         
-        //create bucket limits
         let bucketLimits = [minTempo];
         for (let i = 1; i < NUMBER_OF_PLAYLISTS + 1; i++) {
             const currentRange = bucketLimits[i-1] + bucketRange;
             bucketLimits.push(currentRange);
         }
 
-        // create buckets
         let buckets = [];
         for (let i = 1; i < bucketLimits.length; i++) {
             if (i === 1) {
@@ -53,7 +51,6 @@ module.exports = async (req, res, next) => {
             }
         }
 
-        // assign descriptions to buckets
         for (let i = 0; i < buckets.length; i++) {
             let bucket = {
                 ...buckets[i],
@@ -62,7 +59,6 @@ module.exports = async (req, res, next) => {
             buckets[i] = bucket
         }
         
-        // save buckets in postgres
         const playlists = buckets.map((bucket) => ({
             name: `${Math.ceil(bucket.start)} - ${bucket.end}`,
             description: bucket.description,
