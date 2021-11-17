@@ -1,6 +1,8 @@
 
 export interface User {
-    displayName: String;
-    timestamp: Number;
-    country: String;
+    id: Number
+    displayName: String
+    timestamp: Number
+    country: String
+    spotifyUri: String
 }

@@ -38,13 +38,13 @@ module.exports = async (req, res, next) => {
         }
 
         const tracksToInsert = items.map((item) => ({ spotify_id: item.track.id, user_id: userId, name: item.track.name }));
-        const insert = await postgres('track').insert(tracksToInsert);
+        // const insert = await postgres('track').insert(tracksToInsert);
 
         req.info = {
             totalSongs,
             items,
             tracksToInsert,
-            insert
+            // insert
         }
         
         return showResults(req, res);

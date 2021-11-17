@@ -45,7 +45,7 @@ module.exports = async (req, res, next) => {
 
         req.info = {
             savedPlaylists,
-            playlistResponse
+            playlistResponse,
         }
 
         return showResults(req, res)
