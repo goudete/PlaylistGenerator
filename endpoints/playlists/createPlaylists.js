@@ -12,12 +12,14 @@ module.exports = async (req, res, next) => {
     const userId = req.body.user_id;
 
     try {
+        let spotifyUserId = await postgres('users').select('spotify_id').where({ id: userId });
+            spotifyUserId = spotifyUserId[0].spotify_id;
         const savedPlaylists = await postgres('playlist').where({ user_id: userId });
 
         const createPlaylistPromises = await Promise.all(
             savedPlaylists.map((playlist) => {
                 return axios({
-                    url: `${SPOTIFY_URL}/${userId}/playlists`,
+                    url: `${SPOTIFY_URL}/${spotifyUserId}/playlists`,
                     method: 'POST',
                     data: {
                         name: playlist.name,
@@ -33,19 +35,22 @@ module.exports = async (req, res, next) => {
             })
         )
 
-        const playlistResponse = createPlaylistPromises.map(playlist => playlist.data.id);
+        const playlistSpotifyIds = createPlaylistPromises.map(playlist => playlist.data.id);
 
-        // grab playlists' ids and save
-        // let i = 0;
-        // const playlistUpdates = await Promise.all(
-        //     playlistResponseIds.map((id) => {
-        //         return postgres('playlist').where({spotify_id: track.id}).update({ spotify_id: })
-        //     })
-        // );
+        let i = 0;
+        let promises = [];
+        for (const playlist of savedPlaylists) {
+            promises.push( postgres('playlist').where({ id: playlist.id }).update({ spotify_id: playlistSpotifyIds[i] }) );
+            i++;
+        }
+
+        const playlistUpdates = await Promise.all(promises);
 
         req.info = {
+            spotifyUserId,
             savedPlaylists,
-            playlistResponse,
+            playlistSpotifyIds,
+            playlistUpdates
         }
 
         return showResults(req, res)

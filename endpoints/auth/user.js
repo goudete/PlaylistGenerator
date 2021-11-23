@@ -13,7 +13,7 @@ module.exports = async (req, res, next) => {
     try {
         const { data } = await helpers.getUser();
         const user = helpers.createUser(data);
-        const isExistingUser = await postgres('users').where({spotify_uri: user.spotify_uri});
+        const isExistingUser = await postgres('users').where({ spotify_id: user.spotify_id });
         
         if (isExistingUser.length) {
             return res.json({
@@ -51,13 +51,15 @@ const helpers = {
         const displayName = data.display_name;
         const country = data.country;
         const spotifyUri = data.uri;
+        const spotifyId = data.id;
         const timestamp = moment().unix();
 
         return {
             display_name: displayName,
             country_code: country,
             created_at: timestamp,
-            spotify_uri: spotifyUri
+            spotify_uri: spotifyUri,
+            spotify_id: spotifyId
         };
     },
 }
