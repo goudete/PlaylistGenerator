@@ -5,4 +5,5 @@ export interface User {
     timestamp: Number
     country: String
     spotifyUri: String
+    spotifyId: String
 }
