@@ -11,7 +11,7 @@ const SPOTIFY_URL = 'https://api.spotify.com/v1/me/tracks';
 let items = [];
 let totalSongs = 0;
 let offset = 0;
-const limit = 10;
+const limit = 50;
 
 module.exports = async (req, res, next) => {
 
@@ -37,14 +37,18 @@ module.exports = async (req, res, next) => {
             offset += limit
         }
 
-        const tracksToInsert = items.map((item) => ({ spotify_id: item.track.id, user_id: userId, name: item.track.name }));
-        // const insert = await postgres('track').insert(tracksToInsert);
+        const tracksToInsert = items.map((item) => ({
+            spotify_id: item.track.id,
+            spotify_uri: item.track.uri,
+            user_id: userId,
+            name: item.track.name,
+        }));
+        const insert = await postgres('track').insert(tracksToInsert);
 
         req.info = {
             totalSongs,
             items,
             tracksToInsert,
-            // insert
         }
         
         return showResults(req, res);

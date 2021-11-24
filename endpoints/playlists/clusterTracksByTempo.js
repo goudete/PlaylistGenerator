@@ -60,7 +60,7 @@ module.exports = async (req, res, next) => {
         }
         
         const playlists = buckets.map((bucket) => ({
-            name: `${Math.ceil(bucket.start)} - ${bucket.end}`,
+            name: `(${Math.ceil(bucket.start)} - ${bucket.end}) => ${bucket.description}`,
             description: bucket.description,
             user_id: userId,
             range_start: bucket.start,
@@ -79,10 +79,6 @@ module.exports = async (req, res, next) => {
         );
 
         req.info = {
-            savedTracks,
-            minTempo,
-            maxTempo,
-            tempos,
             bucketLimits,
             buckets,
             playlists,

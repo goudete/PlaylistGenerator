@@ -1,7 +1,12 @@
 'use strict';
 
+const axios = require("axios");
+
+const config = require('../../const');
 const postgres = require("../../clients/postgres");
 const { showResults } = require("../../middleware/showResults");
+
+const SPOTIFY_URL = 'https://api.spotify.com/v1/playlists';
 
 module.exports = async (req, res, next) => {
     const userId = req.body.user_id;
@@ -10,7 +15,7 @@ module.exports = async (req, res, next) => {
         const savedPlaylists = await postgres('playlist').where({ user_id: userId });
 
         let playlists = savedPlaylists.map((playlist) => ({
-            playlistId: playlist.spotify_id
+            spotifyId: playlist.spotify_id
         }));
 
         const tracksByPlaylists = await Promise.all(
@@ -30,9 +35,28 @@ module.exports = async (req, res, next) => {
             i++;
         }
 
-        // for each array of tracks, send to spotify api
-            // if tracks.length > 100, need to paginate
+        for (const playlist of playlists) {
+            let offset = 0;
+            let limit = 50;
+            const trackUris = playlist.tracks.map(track => track.spotify_uri);
+            const playlistSize = playlist.tracksLength;
 
+            while (offset <= playlistSize) {
+                const { data } = await axios({
+                    url: `${SPOTIFY_URL}/${playlist.spotifyId}/tracks`,
+                    method: 'POST',
+                    data: {
+                        "uris": trackUris.slice(offset, offset+limit)
+                    },
+                    headers: {
+                        'Authorization': `Bearer ${config.ACCESS_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                offset += limit;
+            }
+        }
 
         req.info = {
             playlists

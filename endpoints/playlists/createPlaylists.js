@@ -15,27 +15,27 @@ module.exports = async (req, res, next) => {
         let spotifyUserId = await postgres('users').select('spotify_id').where({ id: userId });
             spotifyUserId = spotifyUserId[0].spotify_id;
         const savedPlaylists = await postgres('playlist').where({ user_id: userId });
+        let playlistResponse = [];
 
-        const createPlaylistPromises = await Promise.all(
-            savedPlaylists.map((playlist) => {
-                return axios({
-                    url: `${SPOTIFY_URL}/${spotifyUserId}/playlists`,
-                    method: 'POST',
-                    data: {
-                        name: playlist.name,
-                        public: true,
-                        collaborative: false,
-                        description: playlist.description
-                    },
-                    headers: {
-                        'Authorization': `Bearer ${config.ACCESS_TOKEN}`,
-                        'Content-Type': 'application/json'
-                    }
-                })
+        for (const playlist of savedPlaylists) {
+            const { data } = await axios({
+                url: `${SPOTIFY_URL}/${spotifyUserId}/playlists`,
+                method: 'POST',
+                data: {
+                    name: playlist.name,
+                    public: true,
+                    collaborative: false,
+                    description: playlist.description
+                },
+                headers: {
+                    'Authorization': `Bearer ${config.ACCESS_TOKEN}`,
+                    'Content-Type': 'application/json'
+                }
             })
-        )
+            playlistResponse.push(data);
+        }
 
-        const playlistSpotifyIds = createPlaylistPromises.map(playlist => playlist.data.id);
+        const playlistSpotifyIds = playlistResponse.map(playlist => playlist.id);
 
         let i = 0;
         let promises = [];
@@ -50,6 +50,7 @@ module.exports = async (req, res, next) => {
             spotifyUserId,
             savedPlaylists,
             playlistSpotifyIds,
+            playlistResponse,
             playlistUpdates
         }
 

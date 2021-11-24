@@ -47,9 +47,7 @@ module.exports = async (req, res, next) => {
 
         req.info = {
             totalTracks,
-            savedTracks,
             flattenedAudioFeatures,
-            trackUpdates,
             idGroupings
         }
         
