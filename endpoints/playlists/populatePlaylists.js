@@ -37,7 +37,7 @@ module.exports = async (req, res, next) => {
 
         for (const playlist of playlists) {
             let offset = 0;
-            let limit = 50;
+            let limit = 100;
             const trackUris = playlist.tracks.map(track => track.spotify_uri);
             const playlistSize = playlist.tracksLength;
 
