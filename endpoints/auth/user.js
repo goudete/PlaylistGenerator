@@ -11,8 +11,9 @@ const SPOTIFY_URL = 'https://api.spotify.com/v1/me';
 
 module.exports = async (req, res, next) => {
     try {
-        const { data } = await helpers.getUser();
-        const user = helpers.createUser(data);
+        const access_token = req.body.access_token;
+        const { data } = await helpers.getUser(access_token);
+        const user = helpers.createUser(data, access_token);
         const isExistingUser = await postgres('users').where({ spotify_id: user.spotify_id });
         
         if (isExistingUser.length) {
@@ -35,7 +36,7 @@ module.exports = async (req, res, next) => {
 }
 
 const helpers = {
-    getUser: async () => {
+    getUser: async (access_token) => {
         return await axios({
             url: SPOTIFY_URL,
             method: 'GET',
@@ -43,23 +44,25 @@ const helpers = {
                 json: true
             },
             headers: {
-                'Authorization': `Bearer ${config.ACCESS_TOKEN}`
+                'Authorization': `Bearer ${access_token}`
             }
         })
     },
-    createUser: (data) => {
+    createUser: (data, access_token) => {
         const displayName = data.display_name;
         const country = data.country;
         const spotifyUri = data.uri;
         const spotifyId = data.id;
         const timestamp = moment().unix();
+        const accessToken = access_token;
 
         return {
             display_name: displayName,
             country_code: country,
             created_at: timestamp,
             spotify_uri: spotifyUri,
-            spotify_id: spotifyId
+            spotify_id: spotifyId,
+            access_token: accessToken
         };
     },
 }

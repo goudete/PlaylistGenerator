@@ -13,7 +13,7 @@ app.use(express.urlencoded({limit: '1000mb'}));
 app.get('/login', require('./endpoints/auth/login'));
 app.get('/callback', require('./endpoints/auth/callback'));
 app.get('/refreshToken', require('./endpoints/auth/refreshToken'));
-app.get('/user', require('./endpoints/auth/user'));
+app.post('/user', require('./endpoints/auth/user'));
 
 app.post('/getTracks', require('./endpoints/tracks/getTracks'));
 app.post('/getTrackAudioFeatures', require('./endpoints/tracks/getTrackAudioFeatures'));

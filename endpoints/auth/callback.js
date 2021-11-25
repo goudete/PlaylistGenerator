@@ -4,6 +4,7 @@ const axios = require('axios');
 const qs = require('qs');
 const querystring = require('querystring');
 
+const USER_URL = 'http://0.0.0.0:3000/user';
 
 module.exports = async (req, res, next) => {
 
@@ -20,11 +21,20 @@ module.exports = async (req, res, next) => {
     try {
         const { status, data: { access_token, refresh_token }} = await helpers.getTokens(code);
 
+        const { data } = await axios({
+            url: USER_URL,
+            method: 'POST',
+            data: {
+                access_token
+            }
+        })
+
         return res.status(200).json({
             message: "ok",
             status,
             access_token,
-            refresh_token
+            refresh_token,
+            data
         })
     } catch (err) {
         next(err)

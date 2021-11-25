@@ -1,4 +1,3 @@
-
 'use strict';
 
 const showResults = (req, res) => {

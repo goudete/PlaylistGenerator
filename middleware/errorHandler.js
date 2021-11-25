@@ -1,6 +1,5 @@
 'use strict';
 
-
 const handleError = async (error, req, res, next) => {
     const status = 'error';
     const message = `Error: ${error}`;
