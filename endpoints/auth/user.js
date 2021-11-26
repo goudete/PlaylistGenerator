@@ -17,9 +17,13 @@ module.exports = async (req, res, next) => {
         const isExistingUser = await postgres('users').where({ spotify_id: user.spotify_id });
         
         if (isExistingUser.length) {
+            await postgres('users').where({ id: isExistingUser[0].id }).update({ access_token: access_token });
             return res.json({
+                status: 'ok',
                 message: 'user already exists',
-                isExistingUser
+                info: {
+                    user: isExistingUser[0]
+                }
             });
         } else {
             const insert = await postgres('users').insert([user]);

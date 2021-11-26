@@ -32,9 +32,10 @@ module.exports = async (req, res, next) => {
         return res.status(200).json({
             message: "ok",
             status,
-            access_token,
-            refresh_token,
-            data
+            data: {
+                ...data.info.user,
+                refresh_token
+            }
         })
     } catch (err) {
         next(err)
